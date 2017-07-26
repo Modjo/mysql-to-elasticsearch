@@ -1,0 +1,60 @@
+version: '2'
+services:
+    db:
+        build: config/mysql/
+        container_name: db
+        volumes:
+            - ./config/mysql/mysql-docker.cnf:/etc/mysql/conf.d/z99-docker.cnf
+            - ./data/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: mypassword
+            MYSQL_DATABASE: mydatabase
+    elasticsearch:
+        build: config/elasticsearch/
+        container_name: elasticsearch
+        volumes:
+            - ./config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+            - ./data/esdata:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
+            - "9300:9300"
+        environment:
+            ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        mem_limit: 1g
+    logstash:
+        build: config/logstash/
+        container_name: logstash
+        volumes:
+            - ./config/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+            - ./config/logstash/pipeline/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+            - ./config/logstash/catalogtemplate.json:/usr/share/logstash/catalogtemplate.json
+            - ./config/logstash/mysql-connector-java-5.1.42-bin.jar:/usr/share/logstash/mysql-connector-java-5.1.42-bin.jar
+        ports:
+            - "5000:5000"
+        environment:
+          LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+        links:
+            - db
+            - elasticsearch
+    kibana:
+        build: config/kibana/
+        container_name: kibana
+        volumes:
+            - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+        ports:
+            - "5601:5601"
+        links:
+            - elasticsearch
+            
+volumes:
+    esdata:
+        driver: local
+    mysqldata:
+        driver: local

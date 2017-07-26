@@ -1,0 +1,81 @@
+{
+    "template": "catalogtemplate",
+    "settings": {
+        "number_of_shards":   1,
+        "number_of_replicas": 0,
+        "analysis": {
+            "char_filter": {
+                "&_to_and": {
+                    "type": "mapping",
+                    "mappings": [ "&=>and" ]
+                },
+                "nfkc_normalizer": {
+                    "type": "icu_normalizer",
+                    "name": "nfkc"
+                },
+                "quotes": {
+                    "type": "mapping",
+                    "mappings": [
+                        "\\u0091=>\\u0027",
+                        "\\u0092=>\\u0027",
+                        "\\u2018=>\\u0027",
+                        "\\u2019=>\\u0027",
+                        "\\u201B=>\\u0027"
+                    ]
+                }
+            },
+            "filter": {
+                "autocomplete_filter": {
+                    "type":          "ngram",
+                    "min_gram":      2,
+                    "max_gram":      20,
+                    "token_chars": [ "letter", "digit", "punctuation", "symbol" ]
+                }
+            },
+            "analyzer": {
+                "autocomplete_analyzer": {
+                    "type":          "custom",
+                    "stopwords":     "_none_",
+                    "char_filter": [ "&_to_and", "nfkc_normalizer", "quotes" ],
+                    "tokenizer":     "whitespace",
+                    "filter":      [ "lowercase", "asciifolding", "autocomplete_filter" ]
+                },
+                "whitespace_analyzer": {
+                    "type":          "custom",
+                    "stopwords":     "_none_",
+                    "char_filter": [ "&_to_and", "nfkc_normalizer", "quotes" ],
+                    "tokenizer":     "whitespace",
+                    "filter":      [ "lowercase", "asciifolding" ]
+                }
+            }
+        }
+    },
+    "mappings": {
+       "_default_": {
+          "dynamic": "strict"
+       },
+        "songs": {
+            "properties": {
+                "id" : {
+                    "type": "short",
+                    "index": "false"
+                },
+                "song": {
+                    "type":            "text",
+                    "analyzer":        "autocomplete_analyzer",
+                    "search_analyzer": "whitespace_analyzer"
+                },
+                "artist": {
+                    "type":            "text",
+                    "analyzer":        "autocomplete_analyzer",
+                    "search_analyzer": "whitespace_analyzer"
+                },
+                "album": {
+                    "type":            "text",
+                    "analyzer":        "autocomplete_analyzer",
+                    "search_analyzer": "whitespace_analyzer"
+                }
+            }
+        }
+    }
+}
