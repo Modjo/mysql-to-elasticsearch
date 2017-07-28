@@ -8,9 +8,9 @@ We will then modify a little bit these data using a filter plugin and then pass 
 At the end you would be able to look up the data with Kibana.
 
 Before using it as is, you just need to dump the following ````mydatabase.sql````file into the ````db```` container. I would advise you to:
-1. launch docker a first time. Type ````docker-compose up -d````
-2. connect to MySQL with ````mysql -u root -p````. Password is ````mypassword````
-3. create the ````mydatabase```` database and dump the ````mydatabase.sql```` from the repo
+1. Launch docker a first time. Type ````docker-compose up -d````
+2. Connect to MySQL with ````mysql -u root -p````. Password is ````mypassword````
+3. Create the ````mydatabase```` database and dump the ````mydatabase.sql```` from the repo
 4. Once it is done, close the service with ````docker-compose down````
 5. Relaunch everything : ````docker-compose up````
 
